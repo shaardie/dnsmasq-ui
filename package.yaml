@@ -1,0 +1,54 @@
+name:                dnsmasq-ui
+version:             0.1.0.0
+github:              "shaardie/dnsmasq-ui"
+license:             BSD3
+author:              "Sven Haardiek"
+maintainer:          "sven@haardiek.de"
+copyright:           "MIT"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/shaardie/dnsmasq-ui#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- scotty
+- http-types
+- time
+- aeson
+- wai-extra
+- wai-middleware-static
+
+library:
+  source-dirs: src
+
+executables:
+  dnsmasq-ui-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dnsmasq-ui
+
+tests:
+  dnsmasq-ui-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dnsmasq-ui
