@@ -24,8 +24,8 @@ run = scotty 3000 $ do
     -- Serve Static files
     middleware $ staticPolicy (hasPrefix "static/" >-> addBase ".")
     -- Dnsmasq API
-    get "/api/dnsmasq/" getDnsmasq
-    get "/" $ redirect "/static/index.html"
+    get "/api/v1/dnsmasq/" getDnsmasq
+    get "/" $ redirect "/static/index.html?refresh=10"
 
 data DnsmasqEntry = DnsmasqEntry {
     expirationTime :: Int,

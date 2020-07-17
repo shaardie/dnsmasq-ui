@@ -1,0 +1,35 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    margin: auto;
+}
+
+h1 {
+    font-size: xx-large;
+    margin-top: 0;
+    margin-bottom: 50px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #6601c4;
+    color: white;
+    text-align: center;
+}
+
+table {
+    margin: auto;
+    border-collapse: collapse;
+}
+
+td {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+tr {
+    border-bottom: 1px solid black;
+}
