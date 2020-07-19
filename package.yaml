@@ -27,6 +27,7 @@ dependencies:
 - aeson
 - wai-extra
 - wai-middleware-static
+- configurator
 
 library:
   source-dirs: src

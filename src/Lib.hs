@@ -6,7 +6,6 @@ module Lib
     )
 where
 
-
 import           Control.Monad.IO.Class
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
@@ -16,16 +15,33 @@ import           GHC.Generics
 import           Web.Scotty
 import           Network.Wai.Middleware.RequestLogger
 import           Network.Wai.Middleware.Static
+import           Data.Configurator
+
+
 
 run :: IO ()
-run = scotty 3000 $ do
-    -- Logging middleware
-    middleware logStdoutDev
-    -- Serve Static files
-    middleware $ staticPolicy (hasPrefix "static/" >-> addBase ".")
-    -- Dnsmasq API
-    get "/api/v1/dnsmasq/" getDnsmasq
-    get "/" $ redirect "/static/index.html?refresh=10"
+run = do
+    -- Configuration
+    cfg <- load
+        [ Optional "/etc/dnsmasq-ui.conf"
+        , Optional "$(HOME)/.dnsmasq-ui.conf"
+        , Optional "dnsmasq-ui.conf"
+        ]
+    port              <- (lookupDefault 3000 cfg "server.port" :: IO Int)
+    staticDir         <- (lookupDefault "." cfg "server.static" :: IO FilePath)
+    dnsmasqLeasesFile <-
+        (lookupDefault "/var/lib/misc/dnsmasq.leases" cfg "dnsmasq.leases" :: IO
+              FilePath
+        )
+
+    scotty port $ do
+        -- Logging middleware
+        middleware logStdoutDev
+        -- Serve Static files
+        middleware $ staticPolicy (hasPrefix "static/" >-> addBase staticDir)
+        -- Dnsmasq API
+        get "/api/v1/dnsmasq/" $ getDnsmasq dnsmasqLeasesFile
+        get "/" $ redirect "/static/index.html?refresh=10"
 
 data DnsmasqEntry = DnsmasqEntry {
     expirationTime :: Int,
@@ -59,7 +75,7 @@ readDnsmasq fp = do
     contents <- readFile fp
     return $ parseDnsmasq contents
 
-getDnsmasq :: ActionM ()
-getDnsmasq = do
-    contents <- liftIO $ readDnsmasq "dnsmasq.leases"
+getDnsmasq :: FilePath -> ActionM ()
+getDnsmasq fp = do
+    contents <- liftIO $ readDnsmasq fp
     json contents
