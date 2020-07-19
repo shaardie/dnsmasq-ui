@@ -13,11 +13,16 @@ import           Data.Aeson                     ( FromJSON
 import           Data.Maybe
 import           GHC.Generics
 import           Web.Scotty
+import           Network.Wai.Handler.Warp       ( setHost
+                                                , setPort
+                                                , defaultSettings
+                                                , HostPreference
+                                                )
 import           Network.Wai.Middleware.RequestLogger
 import           Network.Wai.Middleware.Static
 import           Data.Configurator
-
-
+import           Data.Streaming.Network.Internal
+                                                ( HostPreference(Host) )
 
 run :: IO ()
 run = do
@@ -27,14 +32,16 @@ run = do
         , Optional "$(HOME)/.dnsmasq-ui.conf"
         , Optional "dnsmasq-ui.conf"
         ]
-    port              <- (lookupDefault 3000 cfg "server.port" :: IO Int)
-    staticDir         <- (lookupDefault "." cfg "server.static" :: IO FilePath)
+    host <- lookupDefault "127.0.0.1" cfg "server.host" :: IO String
+    port              <- lookupDefault 3000 cfg "server.port" :: IO Int
+    staticDir         <- lookupDefault "." cfg "server.static" :: IO FilePath
     dnsmasqLeasesFile <-
-        (lookupDefault "/var/lib/misc/dnsmasq.leases" cfg "dnsmasq.leases" :: IO
-              FilePath
-        )
+        lookupDefault "/var/lib/misc/dnsmasq.leases" cfg "dnsmasq.leases" :: IO
+            FilePath
 
-    scotty port $ do
+    let options = Options 1 $ setPort port $ setHost (Host host) defaultSettings
+
+    scottyOpts options $ do
         -- Logging middleware
         middleware logStdoutDev
         -- Serve Static files

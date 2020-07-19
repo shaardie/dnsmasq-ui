@@ -28,6 +28,8 @@ dependencies:
 - wai-extra
 - wai-middleware-static
 - configurator
+- warp
+- streaming-commons
 
 library:
   source-dirs: src
