@@ -68,6 +68,7 @@ test-suite dnsmasq-ui-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      DnsmasqParserSpec
       Paths_dnsmasq_ui
   hs-source-dirs:
       test
@@ -77,6 +78,7 @@ test-suite dnsmasq-ui-test
     , base >=4.7 && <5
     , configurator
     , dnsmasq-ui
+    , hspec
     , http-types
     , scotty
     , streaming-commons

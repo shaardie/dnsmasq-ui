@@ -1,0 +1,8 @@
+cradle:
+  stack:
+    - path: ./test
+      component: "dnsmasq-ui:test:dnsmasq-ui-test"
+    - path: ./src
+      component: "dnsmasq-ui:lib"
+    - path: ./app
+      component: "dnsmasq-ui:exe:dnsmasq-ui-exe"

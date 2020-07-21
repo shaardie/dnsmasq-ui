@@ -31,6 +31,7 @@ dependencies:
 - warp
 - streaming-commons
 
+
 library:
   source-dirs: src
 
@@ -55,3 +56,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - dnsmasq-ui
+    - hspec

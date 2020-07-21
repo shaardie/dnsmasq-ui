@@ -1,15 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module Lib
-    ( run
-    )
-where
+module Lib where
 
 import           Control.Monad.IO.Class
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
+import           Text.Read                      ( readMaybe )
 import           Data.Maybe
 import           GHC.Generics
 import           Web.Scotty
@@ -39,7 +37,8 @@ run = do
         lookupDefault "/var/lib/misc/dnsmasq.leases" cfg "dnsmasq.leases" :: IO
             FilePath
 
-    let options = Options 1 $ setPort port $ setHost (Host host) defaultSettings
+    let options =
+            Options 1 $ setPort port $ setHost (Host host) defaultSettings
 
     scottyOpts options $ do
         -- Logging middleware
@@ -56,20 +55,21 @@ data DnsmasqEntry = DnsmasqEntry {
     ipv4 :: String,
     hostname :: String,
     clientIdentifier :: String
-} deriving (Generic, Show)
+} deriving (Generic, Show, Eq)
 
 instance ToJSON DnsmasqEntry
 instance FromJSON DnsmasqEntry
 
 parseDnsmasqLine :: String -> Maybe DnsmasqEntry
 parseDnsmasqLine s
-    | length ss == 5 = Just DnsmasqEntry
-        { expirationTime   = read (head ss) :: Int
-        , linkAddress      = ss !! 1
-        , ipv4             = ss !! 2
-        , hostname         = ss !! 3
-        , clientIdentifier = ss !! 4
-        }
+    | length ss == 5 = case readMaybe (head ss) :: Maybe Int of
+        Nothing -> Nothing
+        Just e  -> Just DnsmasqEntry { expirationTime   = e
+                                     , linkAddress      = ss !! 1
+                                     , ipv4             = ss !! 2
+                                     , hostname         = ss !! 3
+                                     , clientIdentifier = ss !! 4
+                                     }
     | otherwise = Nothing
     where ss = words s
 
