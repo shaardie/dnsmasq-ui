@@ -1,0 +1,24 @@
+---
+
+on: [push]
+name: build
+jobs:
+  build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-haskell@v1.1
+        with:
+          ghc-version: '8.8.3'
+          enable-stack: true
+          stack-version: 'latest'
+      - uses: actions/cache@v2
+        name: Cache stack
+        with:
+          path: |
+            .stack-work
+            ~/.stack
+          key: ${{ runner.os }}-stack-work
+      - run: stack build
+      - run: stack test
